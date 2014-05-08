@@ -1,0 +1,64 @@
+	
+<html>
+	<head>
+		<script type="text/javascript">
+		var right = "right";
+		var left = "left";
+		var output = [];
+		output[0] = { state: "A", position:0, tape:[1,1,1,0,1,1,1,1,1] };
+
+		var stateTable = {
+			"A": {
+				1: [ 1, right, "A" ],
+				0: [ 0, right, "B" ]
+			},
+			"B": {
+				1: [ 0, left, "C" ],
+				0: [ 0, right, "B" ]
+			},
+			"C": {
+				1: [ 1, left, "D" ],
+				0: [ 0, left, "C" ]
+			},
+			"D": {
+				1: [ 1, left, "D" ],
+				0: [ 1, right, "A" ]
+			}
+		};
+
+		//var m = new TuringMachine(output, stateTable);
+		</script>	
+		<script type="text/javascript" src="js/jquery.min.js" /></script>
+		<script type="text/javascript" src="js/turingMachine.js" /></script>	
+		<style type="text/css">
+		   table {border:1px solid black;}
+		   table td {border:1px solid black;};
+		</style>   
+
+	</head>
+<body>
+	
+	<button type="button" id="step">step</button>
+	<button type="button" id="run">run</button>
+	<div id="stepNum">0</div>
+	<div id="currentState">Current State: A Read: - Write: -</div>
+
+	<div id="stateTable" style="float:left;">
+	</div>
+
+	<div id="outputTable" style="float:left;margin-left:50px">
+		<table>
+			<tr>
+			</tr>
+		</table>
+	</div>
+
+</body>
+</html>
+
+
+
+
+
+
+
