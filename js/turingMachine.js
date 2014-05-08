@@ -11,32 +11,36 @@ function run() {
 
 
 function step() {
+	//setup next step & copy previous tape prior to writing changes
+	stepNum += 1;
+	output[stepNum] = clone( output[stepNum - 1] );
+
 	state = output[stepNum]["state"];
 	tape = output[stepNum]["tape"];
 	position = output[stepNum]["position"];
 	value = tape[position];
 
-	// get actions for this state / value
+	//get actions for this state / value
 	actions = stateTable[state][value];
 
-	//setup next step & copy previous tape prior to writing changes
-	stepNum += 1;
-	output[stepNum] = clone( output[stepNum - 1] );
-
-	//write change
-	output[stepNum]["tape"][position] = actions[0];
+	//write tape value at position
+	tape[position] = actions[0];
 
 	//move position	
+	/*
+		don't need to use HTML element table, which makes display more complex. shoudl do w/ Div's and CSS. 
+		should create a tape object made of tapeRows. tapeRows handle display automatically. 
+	*/
 	if (actions[1] == "right") {
-		output[stepNum]["position"] += 1;
+		position += 1;
 		//if new position is out of bounds, increase length and write default character 0.
-		if (output[stepNum]["position"] > output[stepNum].length ) {
-			output[stepNum]["tape"].push(0);
+		if (position > output[stepNum].length ) {
+			tape.push(0);
 		};
 	} else if (actions[1] == "left") {
-		output[stepNum]["position"] -= 1;
+		position -= 1;
 		//if new position index is negative, unshift and write 0. set index at 0.
-		if (output[stepNum]["position"] < 0 ) {
+		if (position < 0 ) {
 			for (var i = 0; i < output.length; i++) {
 				output[i]["tape"].unshift(0);
 				output[i]["position"] += 1;
@@ -47,15 +51,12 @@ function step() {
 		};
 	};
 
-	//change state
-	output[stepNum]["state"] = actions[2];
-
 	//update outputTable
 	$("#outputTable table").prepend( drawRow(i) );
-	updateHeadInfo(stepNum, actions[2], output[stepNum]["tape"][output[stepNum]["position"]], actions[0]);
+	updateHeadInfo(stepNum, actions[2], tape[position], actions[0]);
 
 	//update stateTable(state,value)
-	updateStateTable(actions[2], output[stepNum]["tape"][output[stepNum]["position"]]);
+	updateStateTable(actions[2], tape[position]);
 }
 
 function drawRow(i) {
