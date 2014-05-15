@@ -1,0 +1,109 @@
+
+<html>
+	<head>
+		<script type="text/javascript" src="js/jquery.min.js" /></script>
+		<script type="text/javascript" src="js/turingMachine.js" /></script>	
+		<style type="text/css">
+		   table {border:1px solid black;}
+		   table td {border:1px solid black;};
+		</style>   	
+	</head>
+<body>
+	<div style="margin-left:400px;width:600px">
+
+
+
+<!--
+		<h1>how computing works - understanding the building blocks</h1>
+
+		<p>Modern computers are so powerful they seem to work like magic. CPU's have billions of transistors and require multi-billion dollar fabrication plants, and generations of evolutions to become what they have. However, the insides of a CPU are not magic and it is interesting to learn how not only CPU's work, but how computing itself is performed. Learning about the fundamentals of computing will demystify the hardware internals of the devices we use everyday and also provide you a deeper level of understanding about what computing actually means and insight into how sub-routines can be grouped to perform more complex operations. </p>
+
+		<p>A turing machine is a simple machine that reads a value, writes a value, moves and changes it's state. The interesting thing about a turing machine is that it can be used to perform any calculation - so actually we can program world of warcraft on a turing machine, although it is incredibly unrealistic. Understanding exactly how such a simple device can be used to do complex computing tasks requires building up knowledge of the building blocks of computing. 
+
+		<p>In order to understand computing I'm going to show how computation happens in a very simple computational model; a turing machine. This is a great way to grasp the concepts and design decisions we need to make as we create the knowledge step by step for each evolution of our machine to do more complex processes. Once those are understood, making the jump to complex processors is an exercise in refactoring / optismising a design that is already understood. If you try to approach this learning by looking at an already optimised design ( a CPU ), you can't understand why the design was made how it was and what the design decisions and tradeoffs went into that design. </p>
+
+		<p>using a turing machine we're going to explore what those are, how they're implemented, what design choices we could make, and ultimately how modern processors and languages are designed. </p>
+-->
+		<h1>Turing Machines</h1>
+
+
+		From <a href="http://en.wikipedia.org/wiki/Turing_machine">http://en.wikipedia.org/wiki/Turing_machine</a>
+
+		<p>It is possible to invent a single machine which can be used to compute any computable sequence. If this machine U is supplied with the tape on the beginning of which is written the string of quintuples separated by semicolons of some computing machine M, then U will compute the same sequence as M.</p>
+
+		<p>Sounds interesting, but how does that <i>actually</i> work?</p>
+
+		<p>I was curious so I started to build more and more complex turing machines to figure this out myself. I started with a simple enough task: addition. My first machine can add any two numbers.</p>
+
+		<p>You'll also notice that everything invovled in computing is <i>just numbers</i> - the machine performs logical operations on <i>just numbers</i> and the numerical outputs are <i>interpreted</i> by humans ( or machines ) into something meaningful.</p>
+
+		<h3>Basic addition turing machine</h3>
+
+		<p>I'm just going to jump into an example of a working machine and then I want to take a moment to analyze it a bit. This machine adds 3 + 4 since the starting tape is [1, 1, 1, 0, 1, 1, 1, 1]. The zero acts as a the separator and the 1's are a simple way of counting. the machine head starts at the red box and acts based on this state table: </p>
+
+		<p>watch it run here:</p>
+
+		<iframe src="additionMachine.html" style="width:600px;height:400px;sandbox:allow-scripts;"></iframe>
+
+		<p>I want to point out that even as simple as this machine is there are some interesting design decisions to consider</p>
+
+		<p>Why was the starting tape [1, 1, 1, 0, 1, 1, 1, 1] and not something else? Why not something more explicit like [3, 4]? If we're only going to add two numbers lets just put them next to eachother and add them. As you can see this works just fine:</p>
+
+		<iframe src="additionMachine34.html" style="width:600px;height:400px;sandbox:allow-scripts;"></iframe>
+
+		<p>This leads to seeing an important design choice:<i><b>the alphabet</b></i>. The machine above used "1,2,3,4,5,6,7,8,9" as it's alphabet. Each state of the system needs a corresponding rule for how to handle each character in the alphabet if it is read. This makes the total number of rules increase geometrically. The total number of rules is the number of states times the number of characters in the alphabet.</p>
+
+		<p>The flexibility to define the alphabet and states makes designing how a turing machine functions rather interesting.</p>
+
+		<p>This leads to an important point about <i><b>counting systems.</b></i> By asking the machine to understand "3" and "4" ( and perhaps up to 10 ) then we're asking it to <i>understand, or have rules for</i> <i>decimal ( base 10 numbers )</i> instead of <a href="http://en.wikipedia.org/wiki/Unary_numeral_system">urnary </a>( tally marks or base-1 ). The computation is the same but the number system ratchets up the number of rules we have to program, and thus the complexity. Adding up to 10+10 with a decimal machine would require 111 rules! And it couldn't even handle 11 + 10 without more rules.</p>
+		
+		<p>The computers you're used to use Binary ( base-2 ) counting systems. It's a convenient design decision for systems with more <i>bits</i>. Your computer can process 32 or 64 bits of information at one time whereas this turing machine is a <i>1 bit</i> system. We can make a turing machine that uses Binary, but it's just more complicated than Uranry counting with a single bit machine. This is an interesting exercise to consider - how does urnary systems hanlde larger numbers? We already did it: 4 was represted over four single bits. How does a system with more bits handle large numbers even in Binary? If a system has 4 bits then the largest number in a single memory space would be [1111] = 15 ( in binary ) so how would we represent something like 47? [0010, 1111]. More rules and states in the machine! Larger computers are the same thing we're doing here but with greater complexities.</p>
+
+		<p>Recall the starting tape of [1, 1, 1, 0, 1, 1, 1, 1] ( Urnary ). The left three 1's can be represented by A and the right four 1's by B. But you see as we run the addition process the initial values of A and B are <i>destroyed</i>. As the machine halts we don't know if we added 1+6, 2+5, etc. This is because the turing machine doesn't have <i>memory</i> as you'd conventionally thing about it. A and B don't exist at some location on a hard disk, they exist in the only memory space the turing machine has: it's tape - and infinite 1 bit memorybank. </p>
+
+		<p>We can make a non-destructive addition machine as well. Why would we want to do that?. In order to do more complex computations we may want to store those values for later recall. The concept is the same as variables, which is why I already began representing them by A and B. In order to do more complex computations we will need variables.</p>
+
+		<p><b>what's in a variable?</b> Since we're using a 1 bit system you can see that the varable A is actually represented by 3 memory spaces, each filled with a 1. In order to <i>use</i> a variable in a program to do anything interesting the program needs to know how to find those memory spaces, how many spaces the varable represents and then begin reading the variable before continuing. The turing machine has unique constraints that make this trivial task require a set of rules to handle it's operation.</p>
+
+		<p>in normal computers you have memory addresses represented by hardware latch addresses. You can really see why the 1 bit constraint is a problem. </p>
+
+		<h3>translating alphabets </h3>
+
+		<p>While the examples above use an alphabet with only 1's and 0's, we don't need to constrain ourselves to that. In following examples I use many more symbols. One of the traits of a turing machine is that we can take a more complex alphabet and encode it to something more simple. For example "0,1,A,B,C" could be encoded a few ways - here's an example:</p>
+
+		<p>0 -> 1 ; 1 -> 11 ; A -> 111 ; B -> 1111 ; C -> 11111</p>
+
+		<p>Any alphabet can be encoded to the most basic alphabet - A two character alphabet and I'm going to use "1" and "0" for simplicity ). But how will the machine know 111 == A? As we read each character and move to the next we change the <i>state</i> of the machine. Imagine you read 1, move right and are in state 2. Read 1, move right and now state 3. Read 1, move right and now state 4. Finally you read zero. As the programmer I know if you got to state 4 then you could only get there by reading three 1's in a row, therefore the character must be A.</p>
+
+		<p>Translating alphabets doesn't end up with a more simple system. You're trading an alphabet reduction for an increase in states. The result is the same number of rules. </p>
+
+		<p>However, encoding alphabets is a critical factor that comes up in more sophisticated machines later. (UTMS )</p>
+
+		<h3>breaking down the addition machine</h3>
+
+		<p>the addition machine is actually composed of several smaller machines that work together to perform the addition calculation. The main machines are an increment and decrementer, which take a value in memory and add 1 or subtract 1. Look at what the machine does: it decrements from A and increments B then repeats until it's finished. </p>
+
+		<p>by chaining together machines we can perform more complex operations. Multiplication is an iteration of addition - for example 3*4 is repeating 4+4+4, or adding 4 to itself 3 times. We can have three variables A,B,C :: 3,4,result and combine smaller machines in this manner....</p>
+
+		<p>Loop 1: decrement A as our first loop counter. Loop 2: Decrement B, increment C, Repair B. By repeating these two machines 4 is copied 3 times to C, resulting in 12. </p>
+
+		<p>The part I left out was moving between memory locations, from A to B to C. These are transitionary states. So the complete machine is comprised of transitionary states and increment / decrement states. Multiplication from 5 instruction <i>groups</i></p>
+
+		<h4>multiplication example</h4>
+		<iframe src="additionMachine.html" style="width:600px;sandbox:allow-scripts;"></iframe>
+	
+		<h3>what other instruction groups are needed?</h3>
+
+		<p>lets extrapolate this idea and consider what other instruction groups are necessary to perform <i>any</i> kind of computation. </p>
+
+		
+		</div>
+	</div>
+</body>
+</html>
+
+
+
+
+
+
