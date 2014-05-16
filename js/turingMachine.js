@@ -1,12 +1,16 @@
 
-function TuringMachine(output, stateTable){
-	this.tape = output["tape"];
-	this.position = output["position"];
-	this.state = output["state"];
+function TuringMachine(stateTable){
+	
+	this.position = 0;
+	this.state = "A";
+	this.lastState = this.state;
 	this.stepNum = 0;
 	this.stateTable = stateTable;
 	this.offset = 200;
 	this.runID = "";
+
+	this.setupTape();
+	$("#result").hide();
 }
 
 TuringMachine.prototype = {
@@ -15,7 +19,7 @@ TuringMachine.prototype = {
 		f = this;
 		if ( this.runID != "" ) return;
 		if ( this.state != "Halt" ) {
-			this.runID = setInterval( 'f.step()' , 45);
+			this.runID = setInterval( 'f.step()' , 15);
 		};
 	},
 	pause: function() {
@@ -50,6 +54,7 @@ TuringMachine.prototype = {
 		
 		this.setHeadValue( this.stateTable[ state ][ read ][0] );
 		this.moveHead( this.stateTable[ state ][ read ][1] );
+		this.lastState = this.state;
 		this.state = this.stateTable[ state ][ read ][2];
 
 		this.drawRow();
@@ -57,13 +62,20 @@ TuringMachine.prototype = {
 		updateHeadInfo(this.stepNum, state, this.headValue(), this.stateTable[state][this.headValue()][0]);
 		updateStateTable(state, this.headValue());
 
-		if (this.state == "Halt")
+		if (this.state == "Halt") {
 			this.pause();
+			$("#result").html("Result = " + getResult(this.tape) ).show();
+		};
 
 	},
 	drawRow: function(){
 	
-		out = "<div class=\"tapeRow\">";
+		out = "";
+		if (transitionStates[this.state] != undefined && this.lastState != this.state ) {
+			//out = "<div class=\"tapeRow\">" + transitionStates[this.state] + "</div>";
+		}
+
+		out += "<div class=\"tapeRow\">";
 		out += "<div class=\"state\"  style=\"margin-right:" + this.offset +"px;\">" + this.state + "</div>";
 		for (var i = 0; i < this.tape.length; i++) {
 			if ( this.position == i ) {
@@ -74,18 +86,46 @@ TuringMachine.prototype = {
 		};
 		out += "</div>";
 		$("#outputTable").prepend( out );
+	},
+	setupTape: function(){
+		a = $("#a").val();
+		b = $("#b").val();
+
+		output = [];
+		//load A value from input
+		output.push(1);
+		while(a > 0) {
+			output.push(1);
+			a--;
+		};
+		output.push(0);
+
+		//load B value from input
+		output.push(1);
+		while(b > 0) {
+			output.push(1);
+			b--;
+		};
+		this.tape = output;
+		this.drawRow();
 	}
 }
 
 
+function getResult(tape){
+	s = tape.reverse().join("");
 
-
-
+	console.info(s);
+	a = s.split("0");
+	r = a[0].split("").length;
+	console.info(r);
+	return r-1;
+}
 
 function updateHeadInfo(stepNum, state, value, write){
-	$("#stepNum").html( "Step: " + stepNum );
 	$("#currentState").html( 
-		"Current State: " + state + 
+		"Step: " + stepNum + 
+		" Current State: " + state + 
 		" Read: " + value + 
 		" Write: " + write
 	);

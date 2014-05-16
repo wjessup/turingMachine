@@ -4,8 +4,6 @@
 		<script type="text/javascript" src="js/jquery.min.js" /></script>
 		<script type="text/javascript">
 
-		var output = { state: "A", position:0, tape:[1,1,1,1,0,1,1,1,1,1] };
-
 		var stateTable = {
 			//SETUP
 			//right to b
@@ -96,11 +94,19 @@
 			}
 		};
 
+		var transitionStates = {
+			"F": "A loop",
+			"K": "B loop"
+		};
+
 
 		$(document).ready(function(){ 
-			var m = new TuringMachine(output, stateTable);
-			m.drawRow();
-
+			var m = new TuringMachine(stateTable);
+			
+			$("#setup").click(function(){
+				$("#outputTable").html("");
+				m = new TuringMachine(stateTable);
+			});
 			$("#step").click(function(){
 				m.step();
 			});
@@ -126,18 +132,23 @@
 		   div.state {border:1px solid #ccc;float:left;width:20px;}
 		   div.tapeRow {clear:left;}
 		   div.tapeItem {border:1px solid #ccc;float:left;}
+		   #result {background-color:red;}
 		</style>   
 
 	</head>
 	<body>
-		
+		<h3>multiply</h3>
+		A:<input id="a" type="text" value="3">
+		B:<input id="b" type="text" value="4">
+
+		<button type="button" id="setup">setup tape</button>
+
 		<button type="button" id="step">step</button>
 		<button type="button" id="run">run</button>
 		<button type="button" id="pause">pause</button>
-		<div id="stepNum">0</div>
-		<div id="currentState">Current State: A Read: - Write: -</div>
-
-
+		<div id="result"></div>
+		
+		<div id="currentState">Step: - Current State: A Read: - Write: -</div>
 		<div id="stateTable"></div>
 		<div id="outputTable"></div>
 
