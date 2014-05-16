@@ -42,7 +42,7 @@ TuringMachine.prototype = {
 			this.offset -= 10;
 		};
 	},
-	step: function() {
+	step: function() {		
 		this.stepNum += 1;
 		
 		read = this.headValue();
@@ -56,6 +56,9 @@ TuringMachine.prototype = {
 
 		updateHeadInfo(this.stepNum, state, this.headValue(), this.stateTable[state][this.headValue()][0]);
 		updateStateTable(state, this.headValue());
+
+		if (this.state == "Halt")
+			this.pause();
 
 	},
 	drawRow: function(){

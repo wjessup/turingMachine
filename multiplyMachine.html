@@ -4,24 +4,95 @@
 		<script type="text/javascript" src="js/jquery.min.js" /></script>
 		<script type="text/javascript">
 
-		var output = { state: "A", position:0, tape:[1,1,1,0,1,1,1,1,1] };
+		var output = { state: "A", position:0, tape:[1,1,1,1,0,1,1,1,1,1] };
 
 		var stateTable = {
+			//SETUP
+			//right to b
 			"A": {
 				1: [ 1, "right", "A" ],
 				0: [ 0, "right", "B" ]
 			},
+			//right to c
 			"B": {
-				1: [ 0, "left", "C" ],
-				0: [ 0, "right", "B" ]
+				1: [ 1, "right", "B" ],
+				0: [ 0, "right", "C" ]
 			},
+			//print bottom mark in c
 			"C": {
 				1: [ 1, "left", "D" ],
-				0: [ 0, "left", "C" ]
+				0: [ 1, "left", "D" ]
 			},
+			//left to bottom of b
 			"D": {
-				1: [ 1, "left", "D" ],
-				0: [ 1, "right", "A" ]
+				1: [ 1, "left", "E" ],
+				0: [ 0, "left", "D" ]
+			},
+			//left to bottom of a
+			"E": {
+				1: [ 1, "left", "E" ],
+				0: [ 0, "left", "F" ]
+			},
+
+			//A LOOP ( do B LOOP for each a )
+			//seek to top of a
+			"F": {
+				1: [ 1, "left", "F" ],
+				0: [ 0, "right", "G" ]
+			},
+			//decrement a
+			"G": {
+				1: [ 0, "right", "H" ],
+				0: [ 0, "right", "H" ] 
+			},
+			//test if a is blank, if so then done.
+			"H": {
+				1: [ 1, "right", "I" ],
+				0: [ 0, "right", "Halt" ]
+			},
+			//right to b
+			"I": {
+				1: [ 1, "right", "I" ],
+				0: [ 0, "right", "J" ]
+			},
+			//move to inside b
+			"J": {
+				1: [ 1, "right", "K" ],
+				0: [ 0, "right", "K" ]
+			},
+
+			//B LOOP ( COPY B to C )
+			//mark b
+			"K": {
+				1: [ 0, "right", "L" ],
+				0: [ 0, "left", "P" ] //if b is empty, back to A-loop
+			},
+			//right to c
+			"L": {
+				1: [ 1, "right", "L" ],
+				0: [ 0, "right", "M" ]
+			},
+			//right past c, mark 1, back to b
+			"M": {
+				1: [ 1, "right", "M" ],
+				0: [ 1, "left", "N" ]
+			},
+			//back to b
+			"N": {
+				1: [ 1, "left", "N" ],
+				0: [ 0, "left", "O" ]
+			},
+			//back to pointer, repair
+			"O": {
+				1: [ 1, "left", "O" ],
+				0: [ 1, "right", "K" ] 
+			},
+			
+			//move from Bloop to Aloop
+			//left to a
+			"P": {
+				1: [ 1, "left", "P" ],
+				0: [ 0, "left", "F" ] //enter A loop
 			}
 		};
 
@@ -52,7 +123,7 @@
 		   #stateTable {float:left;}
 		   #outputTable {float:left;margin-left:20px;}
 		   div.step {border:1px solid #ccc;float:left;}
-		   div.state {border:1px solid #ccc;float:left;}
+		   div.state {border:1px solid #ccc;float:left;width:20px;}
 		   div.tapeRow {clear:left;}
 		   div.tapeItem {border:1px solid #ccc;float:left;}
 		</style>   
